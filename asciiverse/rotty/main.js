@@ -135,7 +135,15 @@ MAIN.utf8 = function (bytes, n) {
     return s;
 };
 
+// A frame is drawn when the page or a canvas changed, and otherwise a few
+// times a second for what moves by itself (blinking, fading; GAME.idleMs,
+// 100 ms by default), so a game waiting for a key costs next to nothing
+MAIN.lastFrame = 0;
 MAIN.frame = function () {
+    var now = Date.now();
+    if (!DOM.dirty && now - MAIN.lastFrame < (GAME.idleMs || 100)) return;
+    DOM.dirty = false;
+    MAIN.lastFrame = now;
     TERM.clear();
     if (GAME.layout) GAME.layout();
     else MAIN.defaultLayout();
